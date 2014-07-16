@@ -2,16 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-from sys import stderr
 import os.path as op
 from glob import glob
 from itertools import permutations
 
-try:
-    from Levenshtein import ratio
-except ImportError:
-    print >> stderr, "Please install the Levenshtein module."
-    exit(1)
+# Installed through setup.py
+from Levenshtein import ratio
 
 # Extension used
 EXT_MOVIE = 'avi', 'mkv', 'mp4'
@@ -31,11 +27,10 @@ def files_with_ext(*extensions):
             yield filename
 
 
-def print_bash(mapping, reverse):
+def print_mv(mapping, reverse):
     """Print the final bash script.
     """
-    print '#!/bin/bash'
-
+    print
     for movie_name, best_sub in mapping.iteritems():
         if reverse:
             # Build new name for sub
@@ -55,23 +50,23 @@ def print_bash(mapping, reverse):
 
 
 def print_report(mapping, remaining_movies, remaining_subs, score=0, n=0):
-    """Report is displayed on stderr.
+    """Report is displayed commented.
     """
+    print
     if not mapping:
-        print >> stderr, '# No mapping! (check if movies/subs)'
+        print '# No mapping! (check if movies/subs)'
     else:
-        print >> stderr, '# Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
+        print '# * Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
+
         for movie_name, sub in mapping.iteritems():
             ratio = compare_names(sub, movie_name)
-            print >> stderr, '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie_name, sub)
+            print '# {0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie_name, sub)
 
     if remaining_subs:
-        print >> stderr, '# Remaining subs  :', ' '.join(remaining_subs)
+        print '# * Remaining subs  :', ' '.join(remaining_subs)
 
     if remaining_movies:
-        print >> stderr, '# Remaining movies:', ' '.join(remaining_movies)
-
-    print >> stderr
+        print '# * Remaining movies:', ' '.join(remaining_movies)
 
 
 def compare_names(a, b):
@@ -86,6 +81,8 @@ def compare_names(a, b):
 def match(movies, subtitles, limit, reverse, verbose):
     """Match movies and subtitles.
     """
+    print '#!/bin/bash'
+
     # We want to optimize the global score of matching, so we
     # test all order of files as input
     best_mapping = {}
@@ -133,7 +130,7 @@ def match(movies, subtitles, limit, reverse, verbose):
                  score=best_score)
 
     if mapping:
-        print_bash(best_mapping, reverse)
+        print_mv(best_mapping, reverse)
 
 
 def main():

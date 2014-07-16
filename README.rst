@@ -6,6 +6,8 @@ based on their names. It is specially useful for series with lots of subtitles.
 It will test all possibilities of matching with one subtitle per movie, and keep
 the best global matching.
 
+The output is a shell script containing the right `mv` commands.
+
 Installation
 ------------
 
@@ -38,13 +40,14 @@ Example
 
  $ touch tata.avi toto.avi toto.srt tutu.avi tutu.fr.srt
 
- $ submatch > result.sh
- # Mapping #0 (average 86%):
- 73%     tutu.avi    ->  tutu.fr.srt
- 100%    toto.avi    ->  toto.srt
- # Remaining movies: tata.avi
-
- $ cat result.sh
+ $ submatch
  #!/bin/bash
+ 
+ # * Mapping #0 (average 86%):
+ # 73%	tutu.avi	->	tutu.fr.srt
+ # 100%	toto.avi	->	toto.srt
+ # * Remaining movies: tata.avi
+ 
  mv tutu.avi tutu.fr.avi
 
+ $ submatch | sh
