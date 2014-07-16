@@ -58,7 +58,7 @@ def print_report(mapping, remaining_movies, remaining_subs, score=0, n=0):
     if not mapping:
         print >> stderr, '# No mapping! (check if movies/subs)'
     else:
-        print >> stderr, '## Mapping #{0} ({1:.0f}%):'.format(n, 100 * score / len(mapping))
+        print >> stderr, '## Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
         for movie_name, sub in mapping.iteritems():
             ratio = compare_names(sub, movie_name)
             print >> stderr, '{0}\t->\t{1}\t{2:.0f}%'.format(movie_name, sub, 100 * ratio)
@@ -148,7 +148,8 @@ def main():
         default=DEFAULT_RATIO,
         help="""
         Change lower bound for matching ratio.
-        Default is %(default)s.
+        Default is %(default)s. Matches below
+        that percentage are automatically excluded.
         """)
 
     parser.add_argument(
@@ -164,7 +165,7 @@ def main():
         '-v', '--verbose',
         action='store_true',
         help="""
-        Toggle verbose mode.
+        Display information for each matching test.
         """)
 
     args = parser.parse_args()

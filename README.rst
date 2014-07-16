@@ -13,15 +13,30 @@ Installation
 
  $ python setup.py install --user
 
+Usage
+-----
+
+.. code-block:: bash
+
+ $ submatch -h
+ usage: submatch [-h] [-l LIMIT] [-r] [-v]
+ 
+ optional arguments:
+   -h, --help            show this help message and exit
+   -l LIMIT, --limit LIMIT
+                         Change lower bound for matching ratio. Default is 0.2.
+                         Matches below that percentage are automatically
+                         excluded.
+   -r, --reverse         Reverse the logic of renaming. With this option,
+                         subtitles are renamed, not movies.
+   -v, --verbose         Display information for each matching test.
+
 Example
 -------
 
 .. code-block:: bash
 
- $ cd example
- $ ls
- tata.avi  toto.avi  toto.srt  tutu.avi  tutu.fr.srt
-
+ $ touch tata.avi  toto.avi  toto.srt  tutu.avi  tutu.fr.srt
  $ submatch > result.sh
  ## Mapping #0 (86%):
  tutu.avi   ->  tutu.fr.srt 73%
@@ -34,3 +49,4 @@ Example
  #!/bin/bash
  mv tutu.avi tutu.fr.avi
  mv toto.avi toto.avi
+
