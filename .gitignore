@@ -1,0 +1,9 @@
+*.avi
+*.mkv
+*.srt
+*.sub
+*.sw[po]
+*.py[co]
+*.egg-info
+dist
+build
