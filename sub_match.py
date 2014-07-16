@@ -42,14 +42,16 @@ def print_bash(mapping, reverse):
             new_sub_name = op.splitext(movie_name)[0] + \
                            op.splitext(best_sub)[1]
 
-            print 'mv {0} {1}'.format(best_sub, new_sub_name)
+            if best_sub != new_sub_name:
+                print 'mv {0} {1}'.format(best_sub, new_sub_name)
 
         else:
             # Build new name for movie: sub name + original movie extension
             new_movie_name = op.splitext(best_sub)[0] + \
                              op.splitext(movie_name)[1]
 
-            print 'mv {0} {1}'.format(movie_name, new_movie_name)
+            if movie_name != new_movie_name:
+                print 'mv {0} {1}'.format(movie_name, new_movie_name)
 
 
 def print_report(mapping, remaining_movies, remaining_subs, score=0, n=0):
@@ -58,18 +60,16 @@ def print_report(mapping, remaining_movies, remaining_subs, score=0, n=0):
     if not mapping:
         print >> stderr, '# No mapping! (check if movies/subs)'
     else:
-        print >> stderr, '## Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
+        print >> stderr, '# Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
         for movie_name, sub in mapping.iteritems():
             ratio = compare_names(sub, movie_name)
-            print >> stderr, '{0}\t->\t{1}\t{2:.0f}%'.format(movie_name, sub, 100 * ratio)
+            print >> stderr, '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie_name, sub)
 
     if remaining_subs:
-        print >> stderr, '\n# Remaining subtitles:'
-        print >> stderr, '\n'.join(remaining_subs)
+        print >> stderr, '# Remaining subs  :', ' '.join(remaining_subs)
 
     if remaining_movies:
-        print >> stderr, '\n# Remaining movies:'
-        print >> stderr, '\n'.join(remaining_movies)
+        print >> stderr, '# Remaining movies:', ' '.join(remaining_movies)
 
     print >> stderr
 

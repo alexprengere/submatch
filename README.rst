@@ -19,7 +19,7 @@ Usage
 .. code-block:: bash
 
  $ submatch -h
- usage: submatch [-h] [-l LIMIT] [-r] [-v]
+ usage: sub_match.py [-h] [-l LIMIT] [-r] [-v]
  
  optional arguments:
    -h, --help            show this help message and exit
@@ -36,17 +36,15 @@ Example
 
 .. code-block:: bash
 
- $ touch tata.avi  toto.avi  toto.srt  tutu.avi  tutu.fr.srt
- $ submatch > result.sh
- ## Mapping #0 (86%):
- tutu.avi   ->  tutu.fr.srt 73%
- toto.avi   ->  toto.srt    100%
+ $ touch tata.avi toto.avi toto.srt tutu.avi tutu.fr.srt
 
- # Remaining movies:
- tata.avi
+ $ submatch > result.sh
+ # Mapping #0 (average 86%):
+ 73%     tutu.avi    ->  tutu.fr.srt
+ 100%    toto.avi    ->  toto.srt
+ # Remaining movies: tata.avi
 
  $ cat result.sh
  #!/bin/bash
  mv tutu.avi tutu.fr.avi
- mv toto.avi toto.avi
 
