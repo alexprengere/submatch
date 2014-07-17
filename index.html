@@ -3,35 +3,44 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Submatch by alexprengere</title>
-
+    <title>SubMatch by alexprengere</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <div class="wrapper">
+
       <header>
-        <h1 class="header">Submatch</h1>
-        <p class="header">Match movies and subtitles from their names</p>
-
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/alexprengere/submatch/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/alexprengere/submatch/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/alexprengere/submatch">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/alexprengere">alexprengere</a></p>
-
-
+        <h1>SubMatch</h1>
+        <p>Match movies and subtitles from their names</p>
       </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/alexprengere/submatch" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/alexprengere/submatch/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/alexprengere/submatch/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
       <section>
         <h1>
-<a name="submatch" class="anchor" href="#submatch"><span class="octicon octicon-link"></span></a>submatch</h1>
+<a name="submatch" class="anchor" href="#submatch"><span class="octicon octicon-link"></span></a>SubMatch</h1>
 
 <p>This is a Python utility to match movies and subtitles inside a
 directory, based on their names. It is specially useful for series with
@@ -49,17 +58,13 @@ lots of subtitles.</p>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <div class="highlight highlight-bash"><pre><span class="nv">$ </span>submatch -h
-usage: sub_match.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-l LIMIT<span class="o">]</span> <span class="o">[</span>-r<span class="o">]</span> <span class="o">[</span>-n<span class="o">]</span>
-
 optional arguments:
-  -h, --help            show this <span class="nb">help </span>message and <span class="nb">exit</span>
-  -l LIMIT, --limit LIMIT
-                        Change lower bound <span class="k">for</span> matching ratio. Default is 0.6.
-                        Matches below that percentage are automatically
-                        excluded.
-  -r, --reverse         Reverse the logic of renaming. With this option,
-                        subtitles are renamed, not movies.
-  -n, --no-ext          Consider files with no extension as movies.
+  -h, --help       show this <span class="nb">help </span>message and <span class="nb">exit</span>
+  -l L, --limit L  Change lower bound <span class="k">for</span> matching ratio. Default is 0.6.
+                   Matches below that percentage are automatically excluded.
+  -r, --reverse    Reverse the logic of renaming. With this option, subtitles
+                   are renamed, not movies.
+  -n, --no-ext     Consider files with no extension as movies.
 </pre></div>
 
 <h2>
@@ -91,10 +96,11 @@ mv TUTU.AVI tutu.fr.AVI
 </pre></div>
       </section>
       <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+        <p>Project maintained by <a href="https://github.com/alexprengere">alexprengere</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+    
   </body>
 </html>
