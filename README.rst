@@ -19,32 +19,45 @@ Usage
 .. code-block:: bash
 
  $ submatch -h
- usage: sub_match.py [-h] [-l LIMIT] [-r] [-v]
+ usage: sub_match.py [-h] [-l LIMIT] [-r] [-n]
  
  optional arguments:
    -h, --help            show this help message and exit
    -l LIMIT, --limit LIMIT
-                         Change lower bound for matching ratio. Default is 0.2.
+                         Change lower bound for matching ratio. Default is 0.6.
                          Matches below that percentage are automatically
                          excluded.
    -r, --reverse         Reverse the logic of renaming. With this option,
                          subtitles are renamed, not movies.
+   -n, --no-ext          Consider files with no extension as movies.
 
 Example
 -------
+Suppose you have some movies and subtitles:
 
 .. code-block:: bash
 
- $ touch tata.avi toto.avi toto.srt tutu.avi tutu.fr.srt
+ $ touch tata.avi titi.sub toto.avi toto.srt TUTU.AVI tutu.fr.srt
+
+After installation, just run the tool in the folder:
+
+.. code-block:: bash
 
  $ submatch
  #!/bin/bash
  
- # * Mapping #best (average 86%):
- # 73%	tutu.avi	->	tutu.fr.srt
- # 100%	toto.avi	->	toto.srt
+ # * Mapping:
+ # 100%  toto.avi    ->  toto.srt
+ # 73%   TUTU.AVI    ->  tutu.fr.srt
+ # * Remaining subs  : titi.sub
  # * Remaining movies: tata.avi
  
- mv tutu.avi tutu.fr.avi
+ # toto.avi has the right name ;)
+ mv TUTU.AVI tutu.fr.AVI
+
+You can then actually perform the move like this:
+
+.. code-block:: bash
 
  $ submatch | sh
+

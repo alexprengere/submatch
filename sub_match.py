@@ -26,14 +26,16 @@ DEFAULT_RATIO = 0.60
 
 
 @contextmanager
-def comments(char='#'):
+def comments(comment_char='#'):
     """Add comments to print statement.
     """
+    # Replacing stdout by a local StringIO
     sys.stdout = s = StringIO()
     yield
     sys.stdout = sys.__stdout__
+
     for line in s.getvalue().rstrip().split('\n'):
-        print char, line.rstrip()
+        print comment_char, line
     s.close()
 
 
