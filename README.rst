@@ -33,6 +33,7 @@ Usage
 
 Example
 -------
+
 Suppose you have some movies and subtitles:
 
 .. code-block:: bash
