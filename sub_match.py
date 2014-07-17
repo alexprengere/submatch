@@ -49,14 +49,14 @@ def print_mv(mapping, reverse):
                 print 'mv {0} {1}'.format(movie_name, new_movie_name)
 
 
-def print_report(mapping, remaining_movies, remaining_subs, score=0, n=0):
+def print_report(mapping, remaining_movies, remaining_subs, score=0, name=0):
     """Report is displayed commented.
     """
     print
     if not mapping:
         print '# No mapping! (check if movies/subs)'
     else:
-        print '# * Mapping #{0} (average {1:.0f}%):'.format(n, 100 * score / len(mapping))
+        print '# * Mapping #{0} (average {1:.0f}%):'.format(name, 100 * score / len(mapping))
 
         for movie_name, sub in mapping.iteritems():
             ratio = compare_names(sub, movie_name)
@@ -120,23 +120,23 @@ def match(movies, subtitles, limit, reverse, verbose):
             # Storing result in mapping, and removing sub from available_subs
             # We do not want this sub to be used again
             mapping[movie_name] = best_sub
-            available_subs.remove(best_sub)
             score += best_ratio
+            available_subs.remove(best_sub)
 
         if score > best_score:
-            best_score = score
             best_mapping = mapping
+            best_score = score
 
         if verbose:
             print_report(mapping,
                          remaining_movies=[m for m in movies if m not in mapping],
                          remaining_subs=[s for s in subtitles if s not in mapping.values()],
-                         score=score, n=n)
+                         score=score, name=n)
 
     print_report(best_mapping,
                  remaining_movies=[m for m in movies if m not in best_mapping],
                  remaining_subs=[s for s in subtitles if s not in best_mapping.values()],
-                 score=best_score)
+                 score=best_score, name=' best!')
 
     if mapping:
         print_mv(best_mapping, reverse)
