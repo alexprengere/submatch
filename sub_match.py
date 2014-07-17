@@ -23,9 +23,9 @@ def files_with_ext(*extensions):
     ['movie.avi', 'movie_2.avi']
     """
     for ext in extensions:
-        for filename in glob('*.{}'.format(ext.lower())):
+        for filename in glob('*.{0}'.format(ext.lower())):
             yield filename
-        for filename in glob('*.{}'.format(ext.upper())):
+        for filename in glob('*.{0}'.format(ext.upper())):
             yield filename
 
 
