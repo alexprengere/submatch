@@ -173,6 +173,7 @@ def main():
         '-l', '--limit',
         type=float,
         default=DEFAULT_RATIO,
+        metavar='L',
         help="""
         Change lower bound for matching ratio.
         Default is %(default)s. Matches below
