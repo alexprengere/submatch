@@ -4,7 +4,6 @@
 from __future__ import division
 import os.path as op
 from glob import glob
-from itertools import permutations
 
 # Installed through setup.py
 from Levenshtein import ratio
@@ -77,6 +76,15 @@ def compare_names(a, b):
     b = op.splitext(op.basename(b))[0]
 
     return ratio(a, b)
+
+
+def permutations(movies):
+    """Different permutations tested for input list of movies.
+    """
+    yield sorted(movies)
+    yield sorted(movies, key=len)
+    yield reversed(sorted(movies))
+    yield reversed(sorted(movies, key=len))
 
 
 def match(movies, subtitles, limit, reverse, verbose):
