@@ -23,7 +23,9 @@ def files_with_ext(*extensions):
     ['movie.avi', 'movie_2.avi']
     """
     for ext in extensions:
-        for filename in glob('*.{}'.format(ext)):
+        for filename in glob('*.{}'.format(ext.lower())):
+            yield filename
+        for filename in glob('*.{}'.format(ext.upper())):
             yield filename
 
 
@@ -75,7 +77,7 @@ def compare_names(a, b):
     a = op.splitext(op.basename(a))[0]
     b = op.splitext(op.basename(b))[0]
 
-    return ratio(a, b)
+    return ratio(a.lower(), b.lower())
 
 
 def permutations(movies):
@@ -93,7 +95,7 @@ def match(movies, subtitles, limit, reverse, verbose):
     print '#!/bin/bash'
 
     # We want to optimize the global score of matching, so we
-    # test different files as input
+    # test different files ordering as input
     best_mapping = OrderedDict()
     best_score = 0
 
