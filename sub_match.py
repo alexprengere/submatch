@@ -8,6 +8,7 @@ from itertools import permutations
 
 # Installed through setup.py
 from Levenshtein import ratio
+from ordereddict import OrderedDict
 
 # Extension used
 EXT_MOVIE = 'avi', 'mkv', 'mp4'
@@ -84,15 +85,15 @@ def match(movies, subtitles, limit, reverse, verbose):
     print '#!/bin/bash'
 
     # We want to optimize the global score of matching, so we
-    # test all order of files as input
-    best_mapping = {}
+    # test different files as input
+    best_mapping = OrderedDict()
     best_score = 0
 
     for n, movie_list in enumerate(permutations(movies)):
-        # Store the mapping movie -> sub
         # We copy subtitles, this will be modify along attribution to movies
-        mapping = {}
         available_subs = subtitles[:]
+        # Store the mapping movie -> sub
+        mapping = OrderedDict()
         score = 0
 
         for movie_name in movie_list:
