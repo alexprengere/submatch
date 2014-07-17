@@ -1,4 +1,4 @@
-submatch
+SubMatch
 ========
 
 This is a Python utility to match movies and subtitles inside a directory,
