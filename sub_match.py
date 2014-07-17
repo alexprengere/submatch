@@ -4,6 +4,7 @@
 from __future__ import division
 import os.path as op
 from glob import glob
+from itertools import product
 
 # Installed through setup.py
 from Levenshtein import ratio
@@ -16,7 +17,8 @@ EXT_MOVIE = 'avi', 'mkv', 'mp4', \
 
 EXT_SUBTITLE = 'srt', 'sub', 'smi'
 
-DEFAULT_RATIO = 0.20
+# Minimal matching ratio
+DEFAULT_RATIO = 0.50
 
 
 def files_with_ext(*extensions):
@@ -36,36 +38,36 @@ def print_mv(mapping, reverse):
     """Print the final bash script.
     """
     print
-    for movie_name, best_sub in mapping.iteritems():
+    for movie, sub in mapping.iteritems():
         if reverse:
             # Build new name for sub
-            new_sub_name = op.splitext(movie_name)[0] + \
-                           op.splitext(best_sub)[1]
+            new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
 
-            if best_sub != new_sub_name:
-                print 'mv {0} {1}'.format(best_sub, new_sub_name)
+            if sub == new_sub:
+                print '#',
+            print 'mv {0} {1}'.format(sub, new_sub)
 
         else:
             # Build new name for movie: sub name + original movie extension
-            new_movie_name = op.splitext(best_sub)[0] + \
-                             op.splitext(movie_name)[1]
+            new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
 
-            if movie_name != new_movie_name:
-                print 'mv {0} {1}'.format(movie_name, new_movie_name)
+            if movie == new_movie:
+                print '#',
+            print 'mv {0} {1}'.format(movie, new_movie)
 
 
-def print_report(mapping, remaining_movies, remaining_subs, score=0, name=0):
+def print_report(mapping, remaining_movies, remaining_subs):
     """Report is displayed commented.
     """
     print
     if not mapping:
         print '# No mapping! (check if movies/subs)'
     else:
-        print '# * Mapping #{0} (average {1:.0f}%):'.format(name, 100 * score / len(mapping))
+        print '# * Mapping:'
 
-        for movie_name, sub in mapping.iteritems():
-            ratio = compare_names(sub, movie_name)
-            print '# {0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie_name, sub)
+        for movie, sub in mapping.iteritems():
+            ratio = compare_names(sub, movie)
+            print '# {0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
 
     if remaining_subs:
         print '# * Remaining subs  :', ' '.join(remaining_subs)
@@ -83,68 +85,45 @@ def compare_names(a, b):
     return ratio(a.lower(), b.lower())
 
 
-def permutations(movies):
-    """Different permutations tested for input list of movies.
-    """
-    yield sorted(movies)
-    yield sorted(movies, key=len)
-    yield reversed(sorted(movies))
-    yield reversed(sorted(movies, key=len))
-
-
-def match(movies, subtitles, limit, reverse, verbose):
+def match(movies, subtitles, limit, reverse):
     """Match movies and subtitles.
     """
     print '#!/bin/bash'
 
-    # We want to optimize the global score of matching, so we
-    # test different files ordering as input
-    best_mapping = OrderedDict()
-    best_score = 0
+    # We copy, this will be modify along attribution to movies
+    available_movies = movies[:]
+    available_subs = subtitles[:]
 
-    for n, movie_list in enumerate(permutations(movies)):
-        # We copy subtitles, this will be modify along attribution to movies
-        available_subs = subtitles[:]
-        # Store the mapping movie -> sub
-        mapping = OrderedDict()
-        score = 0
+    # Store the mapping movie -> sub
+    mapping = OrderedDict()
 
-        for movie_name in movie_list:
-            # Perhaps all subtitles have already been attributed
-            if not available_subs:
-                break
+    while True:
+        # Perhaps all subtitles have already been attributed
+        if not available_subs or not available_movies:
+            break
 
-            # Finding best sub for this movie
-            # Then, if ratio is too bad we skip
-            best_sub = max(available_subs, key=lambda s: compare_names(s, movie_name))
+        # Finding best sub for this movie
+        # Then, if ratio is too bad we skip
+        best_pair = max(product(available_movies, available_subs),
+                        key=lambda p: compare_names(*p))
 
-            best_ratio = compare_names(best_sub, movie_name)
-            if best_ratio < limit:
-                continue
+        best_ratio = compare_names(*best_pair)
+        if best_ratio < limit:
+            break
 
-            # Storing result in mapping, and removing sub from available_subs
-            # We do not want this sub to be used again
-            mapping[movie_name] = best_sub
-            score += best_ratio
-            available_subs.remove(best_sub)
+        # Storing result in mapping, and removing from available
+        # We do not want this sub/movie to be used again
+        movie, sub = best_pair
 
-        if score > best_score:
-            best_mapping = mapping
-            best_score = score
+        mapping[movie] = sub
+        available_movies.remove(movie)
+        available_subs.remove(sub)
 
-        if verbose:
-            print_report(mapping,
-                         remaining_movies=[m for m in movies if m not in mapping],
-                         remaining_subs=[s for s in subtitles if s not in mapping.values()],
-                         score=score, name=n)
+    print_report(mapping,
+                 remaining_movies=available_movies,
+                 remaining_subs=available_subs)
 
-    print_report(best_mapping,
-                 remaining_movies=[m for m in movies if m not in best_mapping],
-                 remaining_subs=[s for s in subtitles if s not in best_mapping.values()],
-                 score=best_score, name=' best!')
-
-    if mapping:
-        print_mv(best_mapping, reverse)
+    print_mv(mapping, reverse=reverse)
 
 
 def main():
@@ -179,13 +158,6 @@ def main():
         Consider files with no extension as movies.
         """)
 
-    parser.add_argument(
-        '-v', '--verbose',
-        action='store_true',
-        help="""
-        Display information for each matching test.
-        """)
-
     args = parser.parse_args()
 
     movies = sorted(files_with_ext(*EXT_MOVIE))
@@ -197,8 +169,7 @@ def main():
     match(movies,
           subtitles,
           limit=args.limit,
-          reverse=args.reverse,
-          verbose=args.verbose)
+          reverse=args.reverse)
 
 
 if __name__ == '__main__':
