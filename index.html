@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Submatch by alexprengere</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/alexprengere/submatch">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/alexprengere/submatch/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/alexprengere/submatch/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Submatch</h1>
+          <p>Match movies and subtitles from their names</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/alexprengere">alexprengere</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="submatch" class="anchor" href="#submatch"><span class="octicon octicon-link"></span></a>submatch</h1>
+
+<p>This is a Python utility to match movies and subtitles inside a
+directory, based on their names. It is specially useful for series with
+lots of subtitles.</p>
+
+<p>The output is a shell script containing the right <code>mv</code> commands.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre lang="sourceCode"><code>$ python setup.py install --user
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre lang="sourceCode"><code>$ submatch -h
+usage: sub_match.py [-h] [-l LIMIT] [-r] [-n]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l LIMIT, --limit LIMIT
+                        Change lower bound for matching ratio. Default is 0.6.
+                        Matches below that percentage are automatically
+                        excluded.
+  -r, --reverse         Reverse the logic of renaming. With this option,
+                        subtitles are renamed, not movies.
+  -n, --no-ext          Consider files with no extension as movies.
+</code></pre>
+
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>Suppose you have some movies and subtitles:</p>
+
+<pre lang="sourceCode"><code>$ touch tata.avi titi.sub toto.avi toto.srt TUTU.AVI tutu.fr.srt
+</code></pre>
+
+<p>After installation, just run the tool in the folder:</p>
+
+<pre lang="sourceCode"><code>$ submatch
+#!/bin/bash
+
+# * Mapping:
+# 100%  toto.avi    -&gt;  toto.srt
+# 73%   TUTU.AVI    -&gt;  tutu.fr.srt
+# * Remaining subs  : titi.sub
+# * Remaining movies: tata.avi
+
+# toto.avi has the right name ;)
+mv TUTU.AVI tutu.fr.AVI
+</code></pre>
+
+<p>You can then actually perform the move like this:</p>
+
+<pre lang="sourceCode"><code>$ submatch | sh
+</code></pre>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
