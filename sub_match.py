@@ -173,6 +173,13 @@ def main():
         """)
 
     parser.add_argument(
+        '-n', '--no-ext',
+        action='store_true',
+        help="""
+        Consider files with no extension as movies.
+        """)
+
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         help="""
@@ -183,6 +190,9 @@ def main():
 
     movies = sorted(files_with_ext(*EXT_MOVIE))
     subtitles = sorted(files_with_ext(*EXT_SUBTITLE))
+
+    if args.no_ext:
+        movies.extend([f for f in glob('*') if not op.splitext(f)[1]])
 
     match(movies,
           subtitles,
