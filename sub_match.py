@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+
+import sys
 import os.path as op
 from glob import glob
 from itertools import product
+from contextlib import contextmanager
+from StringIO import StringIO
 
 # Installed through setup.py
 from Levenshtein import ratio
@@ -18,7 +22,19 @@ EXT_MOVIE = 'avi', 'mkv', 'mp4', \
 EXT_SUBTITLE = 'srt', 'sub', 'smi'
 
 # Minimal matching ratio
-DEFAULT_RATIO = 0.50
+DEFAULT_RATIO = 0.60
+
+
+@contextmanager
+def comments(char='#'):
+    """Add comments to print statement.
+    """
+    sys.stdout = s = StringIO()
+    yield
+    sys.stdout = sys.__stdout__
+    for line in s.getvalue().split('\n'):
+        print char, line.rstrip()
+    s.close()
 
 
 def files_with_ext(*extensions):
@@ -42,38 +58,34 @@ def print_mv(mapping, reverse):
         if reverse:
             # Build new name for sub
             new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
-
-            if sub == new_sub:
-                print '#',
-            print 'mv {0} {1}'.format(sub, new_sub)
+            if sub != new_sub:
+                print 'mv {0} {1}'.format(sub, new_sub)
+            else:
+                print '# {0} has the right name ;)'.format(sub)
 
         else:
             # Build new name for movie: sub name + original movie extension
             new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
-
-            if movie == new_movie:
-                print '#',
-            print 'mv {0} {1}'.format(movie, new_movie)
+            if movie != new_movie:
+                print 'mv {0} {1}'.format(movie, new_movie)
+            else:
+                print '# {0} has the right name ;)'.format(movie)
 
 
 def print_report(mapping, remaining_movies, remaining_subs):
     """Report is displayed commented.
     """
-    print
-    if not mapping:
-        print '# No mapping! (check if movies/subs)'
-    else:
-        print '# * Mapping:'
+    print '* Mapping:'
 
-        for movie, sub in mapping.iteritems():
-            ratio = compare_names(sub, movie)
-            print '# {0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
+    for movie, sub in mapping.iteritems():
+        ratio = compare_names(sub, movie)
+        print '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
 
     if remaining_subs:
-        print '# * Remaining subs  :', ' '.join(remaining_subs)
+        print '* Remaining subs  :', ' '.join(remaining_subs)
 
     if remaining_movies:
-        print '# * Remaining movies:', ' '.join(remaining_movies)
+        print '* Remaining movies:', ' '.join(remaining_movies)
 
 
 def compare_names(a, b):
@@ -88,8 +100,6 @@ def compare_names(a, b):
 def match(movies, subtitles, limit, reverse):
     """Match movies and subtitles.
     """
-    print '#!/bin/bash'
-
     # We copy, this will be modify along attribution to movies
     available_movies = movies[:]
     available_subs = subtitles[:]
@@ -119,9 +129,17 @@ def match(movies, subtitles, limit, reverse):
         available_movies.remove(movie)
         available_subs.remove(sub)
 
-    print_report(mapping,
-                 remaining_movies=available_movies,
-                 remaining_subs=available_subs)
+    # Now we print the bash script
+    print '#!/bin/bash\n'
+
+    if not mapping:
+        print 'echo No mapping! Check if movies/subs'
+        return
+
+    with comments():
+        print_report(mapping,
+                     remaining_movies=available_movies,
+                     remaining_subs=available_subs)
 
     print_mv(mapping, reverse=reverse)
 

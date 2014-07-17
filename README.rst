@@ -3,8 +3,6 @@ submatch
 
 This is a Python utility to match movies and subtitles inside a directory,
 based on their names. It is specially useful for series with lots of subtitles.
-It will test different possibilities of matching with one subtitle per movie, and keep
-the best global matching.
 
 The output is a shell script containing the right ``mv`` commands.
 
@@ -31,7 +29,6 @@ Usage
                          excluded.
    -r, --reverse         Reverse the logic of renaming. With this option,
                          subtitles are renamed, not movies.
-   -v, --verbose         Display information for each matching test.
 
 Example
 -------
