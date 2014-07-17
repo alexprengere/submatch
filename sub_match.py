@@ -9,6 +9,7 @@ from glob import glob
 from itertools import product
 from contextlib import contextmanager
 from StringIO import StringIO
+from functools import wraps
 
 # Installed through setup.py
 from Levenshtein import ratio
@@ -37,6 +38,22 @@ def comments(comment_char='#'):
     for line in s.getvalue().rstrip().split('\n'):
         print comment_char, line
     s.close()
+
+
+def cached(func):
+    """Cache decorator for a function with no keywork argument.
+    """
+    cache = {}
+
+    @wraps(func)
+    def new_func(*args):
+        # Simple case here
+        key = args
+        if key not in cache:
+            cache[key] = func(*args)
+        return cache[key]
+
+    return new_func
 
 
 def files_with_ext(*extensions):
@@ -89,7 +106,7 @@ def print_report(mapping, remaining_movies, remaining_subs):
     if remaining_movies:
         print '* Remaining movies:', ' '.join(remaining_movies)
 
-
+@cached
 def compare_names(a, b):
     """Compare names without extensions.
     """
