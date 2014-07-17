@@ -10,8 +10,11 @@ from Levenshtein import ratio
 from ordereddict import OrderedDict
 
 # Extension used
-EXT_MOVIE = 'avi', 'mkv', 'mp4'
-EXT_SUBTITLE = 'srt', 'sub'
+EXT_MOVIE = 'avi', 'mkv', 'mp4', \
+            'flv', 'wmv', '3gp', \
+            'mov'
+
+EXT_SUBTITLE = 'srt', 'sub', 'smi'
 
 DEFAULT_RATIO = 0.20
 
@@ -181,7 +184,11 @@ def main():
     movies = sorted(files_with_ext(*EXT_MOVIE))
     subtitles = sorted(files_with_ext(*EXT_SUBTITLE))
 
-    match(movies, subtitles, args.limit, args.reverse, verbose=args.verbose)
+    match(movies,
+          subtitles,
+          limit=args.limit,
+          reverse=args.reverse,
+          verbose=args.verbose)
 
 
 if __name__ == '__main__':
