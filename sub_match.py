@@ -32,7 +32,7 @@ def comments(char='#'):
     sys.stdout = s = StringIO()
     yield
     sys.stdout = sys.__stdout__
-    for line in s.getvalue().split('\n'):
+    for line in s.getvalue().rstrip().split('\n'):
         print char, line.rstrip()
     s.close()
 
