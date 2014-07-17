@@ -19,17 +19,15 @@ Usage
 .. code-block:: bash
 
  $ submatch -h
- usage: sub_match.py [-h] [-l LIMIT] [-r] [-n]
+ usage: sub_match.py [-h] [-l L] [-r] [-n]
  
  optional arguments:
-   -h, --help            show this help message and exit
-   -l LIMIT, --limit LIMIT
-                         Change lower bound for matching ratio. Default is 0.6.
-                         Matches below that percentage are automatically
-                         excluded.
-   -r, --reverse         Reverse the logic of renaming. With this option,
-                         subtitles are renamed, not movies.
-   -n, --no-ext          Consider files with no extension as movies.
+   -h, --help       show this help message and exit
+   -l L, --limit L  Change lower bound for matching ratio. Default is 0.6.
+                    Matches below that percentage are automatically excluded.
+   -r, --reverse    Reverse the logic of renaming. With this option, subtitles
+                    are renamed, not movies.
+   -n, --no-ext     Consider files with no extension as movies.
 
 Example
 -------
