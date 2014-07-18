@@ -120,7 +120,7 @@ def distance_names(a, b):
     return ratio(a.lower(), b.lower())
 
 
-def match(movies, subtitles, limit, reverse):
+def match(movies, subtitles, limit):
     """Match movies and subtitles.
     """
     # Store the mapping movie -> sub
@@ -145,22 +145,8 @@ def match(movies, subtitles, limit, reverse):
         mapping[movie] = sub
         attributed_subs.add(sub)
 
-    # Now we print the bash script
-    print '#!/bin/bash\n'
+    return mapping
 
-    if not mapping:
-        print 'echo No mapping! Check if movies/subs'
-        return
-
-    with comments():
-        remaining_movies = set(movies) - set(mapping)
-        remaining_subs = set(subtitles) - attributed_subs
-
-        print_report(mapping,
-                     remaining_movies=remaining_movies,
-                     remaining_subs=remaining_subs)
-
-    print_mv(mapping, reverse=reverse)
 
 
 def main():
@@ -204,10 +190,24 @@ def main():
     if args.no_ext:
         movies.extend(sorted(files_with_ext('')))
 
-    match(movies,
-          subtitles,
-          limit=args.limit,
-          reverse=args.reverse)
+    mapping = match(movies,
+                    subtitles,
+                    limit=args.limit)
+
+    # Now we print the bash script
+    if not mapping:
+        print 'echo No mapping! Check if movies/subs'
+        exit(1)
+
+    with comments():
+        remaining_movies = set(movies) - set(mapping)
+        remaining_subs = set(subtitles) - set(mapping.itervalues())
+
+        print_report(mapping,
+                     remaining_movies=remaining_movies,
+                     remaining_subs=remaining_subs)
+
+    print_mv(mapping, reverse=args.reverse)
 
 
 if __name__ == '__main__':
