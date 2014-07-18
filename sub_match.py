@@ -97,17 +97,16 @@ def print_mv(mapping, reverse):
 def print_report(mapping, remaining_movies, remaining_subs):
     """Report is displayed commented.
     """
-    print '* Mapping:'
-
     for movie, sub in mapping.iteritems():
         ratio = distance_names(sub, movie)
         print '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
 
+    print
     if remaining_subs:
-        print '* Remaining subs  :', ' '.join(remaining_subs)
+        print 'Remaining subs  :', ' '.join(remaining_subs)
 
     if remaining_movies:
-        print '* Remaining movies:', ' '.join(remaining_movies)
+        print 'Remaining movies:', ' '.join(remaining_movies)
 
 
 @cached
