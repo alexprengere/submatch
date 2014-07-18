@@ -97,7 +97,7 @@ def print_report(mapping, remaining_movies, remaining_subs):
     print '* Mapping:'
 
     for movie, sub in mapping.iteritems():
-        ratio = compare_names(sub, movie)
+        ratio = distance_names(sub, movie)
         print '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
 
     if remaining_subs:
@@ -107,7 +107,7 @@ def print_report(mapping, remaining_movies, remaining_subs):
         print '* Remaining movies:', ' '.join(remaining_movies)
 
 @cached
-def compare_names(a, b):
+def distance_names(a, b):
     """Compare names without extensions.
     """
     a = op.splitext(op.basename(a))[0]
@@ -119,34 +119,27 @@ def compare_names(a, b):
 def match(movies, subtitles, limit, reverse):
     """Match movies and subtitles.
     """
-    # We copy, this will be modify along attribution to movies
-    available_movies = movies[:]
-    available_subs = subtitles[:]
-
     # Store the mapping movie -> sub
     mapping = OrderedDict()
+    attributed_subs = set()
 
-    while True:
-        # Perhaps all subtitles have already been attributed
-        if not available_subs or not available_movies:
+    # Finding best sub for this movie
+    pairs = sorted(product(movies, subtitles),
+                   key=lambda p: distance_names(*p),
+                   reverse=True)
+
+    for movie, sub in pairs:
+        # Check if movie/sub has already been used
+        if movie in mapping or sub in attributed_subs:
+            continue
+
+        # Then, if ratio is too bad we end the attribution process
+        if distance_names(movie, sub) < limit:
             break
 
-        # Finding best sub for this movie
-        # Then, if ratio is too bad we skip
-        best_pair = max(product(available_movies, available_subs),
-                        key=lambda p: compare_names(*p))
-
-        best_ratio = compare_names(*best_pair)
-        if best_ratio < limit:
-            break
-
-        # Storing result in mapping, and removing from available
         # We do not want this sub/movie to be used again
-        movie, sub = best_pair
-
         mapping[movie] = sub
-        available_movies.remove(movie)
-        available_subs.remove(sub)
+        attributed_subs.add(sub)
 
     # Now we print the bash script
     print '#!/bin/bash\n'
@@ -156,9 +149,12 @@ def match(movies, subtitles, limit, reverse):
         return
 
     with comments():
+        remaining_movies = set(movies) - set(mapping)
+        remaining_subs = set(subtitles) - attributed_subs
+
         print_report(mapping,
-                     remaining_movies=available_movies,
-                     remaining_subs=available_subs)
+                     remaining_movies=remaining_movies,
+                     remaining_subs=remaining_subs)
 
     print_mv(mapping, reverse=reverse)
 
