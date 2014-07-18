@@ -3,9 +3,8 @@
 
 from __future__ import division
 
-import sys
+import os, sys
 import os.path as op
-from glob import glob
 from itertools import product
 from contextlib import contextmanager
 from StringIO import StringIO
@@ -62,11 +61,16 @@ def files_with_ext(*extensions):
     >>> list(files_with_ext('avi'))
     ['movie.avi', 'movie_2.avi']
     """
-    for ext in extensions:
-        for filename in glob('*.{0}'.format(ext.lower())):
-            yield filename
-        for filename in glob('*.{0}'.format(ext.upper())):
-            yield filename
+    authorized_extensions = set(extensions) # faster lookup
+
+    for root, _, files in os.walk('.', topdown=False):
+        for name in files:
+            # Extension without leading '.'
+            # Made non case sensitive
+            ext = op.splitext(name)[1][1:].lower()
+
+            if ext in authorized_extensions:
+                yield op.join(root, name)
 
 
 def print_mv(mapping, reverse):
@@ -105,6 +109,7 @@ def print_report(mapping, remaining_movies, remaining_subs):
 
     if remaining_movies:
         print '* Remaining movies:', ' '.join(remaining_movies)
+
 
 @cached
 def distance_names(a, b):
@@ -198,7 +203,7 @@ def main():
     subtitles = sorted(files_with_ext(*EXT_SUBTITLE))
 
     if args.no_ext:
-        movies.extend([f for f in glob('*') if not op.splitext(f)[1]])
+        movies.extend(sorted(files_with_ext('')))
 
     match(movies,
           subtitles,
