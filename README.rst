@@ -43,12 +43,12 @@ After installation, just run the tool in the folder:
 .. code-block:: bash
 
  $ submatch
- # * Mapping:
  # 100%	./toto.avi	->	./toto.srt
  # 73%	./TUTU.AVI	->	./tutu.fr.srt
- # * Remaining subs  : ./titi.sub
- # * Remaining movies: ./tata.avi
- 
+ # 
+ # Remaining subs  : ./titi.sub
+ # Remaining movies: ./tata.avi
+
  # ./toto.srt has the right name ;)
  mv ./tutu.fr.srt ./TUTU.srt
 
