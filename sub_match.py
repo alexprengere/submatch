@@ -79,20 +79,19 @@ def print_mv(mapping, reverse):
     print
     for movie, sub in mapping.iteritems():
         if reverse:
-            # Build new name for sub
-            new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
-            if sub != new_sub:
-                print 'mv {0} {1}'.format(sub, new_sub)
-            else:
-                print '# {0} has the right name ;)'.format(sub)
-
-        else:
             # Build new name for movie: sub name + original movie extension
             new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
             if movie != new_movie:
                 print 'mv {0} {1}'.format(movie, new_movie)
             else:
                 print '# {0} has the right name ;)'.format(movie)
+        else:
+            # Build new name for sub
+            new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
+            if sub != new_sub:
+                print 'mv {0} {1}'.format(sub, new_sub)
+            else:
+                print '# {0} has the right name ;)'.format(sub)
 
 
 def print_report(mapping, remaining_movies, remaining_subs):
@@ -186,8 +185,8 @@ def main():
         action='store_true',
         help="""
         Reverse the logic of renaming.
-        With this option, subtitles are
-        renamed, not movies.
+        With this option, movies are
+        renamed, not subtitles.
         """)
 
     parser.add_argument(
