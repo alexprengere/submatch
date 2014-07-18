@@ -25,8 +25,8 @@ Usage
    -h, --help       show this help message and exit
    -l L, --limit L  Change lower bound for matching ratio. Default is 0.6.
                     Matches below that percentage are automatically excluded.
-   -r, --reverse    Reverse the logic of renaming. With this option, subtitles
-                    are renamed, not movies.
+   -r, --reverse    Reverse the logic of renaming. With this option, movies are
+                    renamed, not subtitles.
    -n, --no-ext     Consider files with no extension as movies.
 
 Example
@@ -46,13 +46,13 @@ After installation, just run the tool in the folder:
  #!/bin/bash
  
  # * Mapping:
- # 100%  toto.avi    ->  toto.srt
- # 73%   TUTU.AVI    ->  tutu.fr.srt
- # * Remaining subs  : titi.sub
- # * Remaining movies: tata.avi
+ # 100%	./toto.avi	->	./toto.srt
+ # 73%	./TUTU.AVI	->	./tutu.fr.srt
+ # * Remaining subs  : ./titi.sub
+ # * Remaining movies: ./tata.avi
  
- # toto.avi has the right name ;)
- mv TUTU.AVI tutu.fr.AVI
+ # ./toto.srt has the right name ;)
+ mv ./tutu.fr.srt ./TUTU.srt
 
 You can then actually perform the move like this:
 
