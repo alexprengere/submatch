@@ -19,7 +19,7 @@ Usage
 .. code-block:: bash
 
  $ submatch -h
- usage: sub_match.py [-h] [-l L] [-r] [-n]
+ usage: sub_match.py [-h] [-l L] [-r] [-z] [-n]
  
  optional arguments:
    -h, --help       show this help message and exit
@@ -27,6 +27,9 @@ Usage
                     Matches below that percentage are automatically excluded.
    -r, --reverse    Reverse the logic of renaming. With this option, movies are
                     renamed, not subtitles.
+   -z, --zip        Change the logic of matching. Zip the sorted list of movies
+                    and subtitles instead of match on names. This will not use
+                    -l/--limit option.
    -n, --no-ext     Consider files with no extension as movies.
 
 Example
