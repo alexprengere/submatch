@@ -175,6 +175,15 @@ def main():
         """)
 
     parser.add_argument(
+        '-z', '--zip',
+        action='store_true',
+        help="""
+        Change the logic of matching. Zip the sorted
+        list of movies and subtitles instead of match
+        on names. This will not use -l/--limit option.
+        """)
+
+    parser.add_argument(
         '-n', '--no-ext',
         action='store_true',
         help="""
@@ -193,9 +202,13 @@ def main():
         print 'echo No movies/subtitles detected!'
         exit(1)
 
-    mapping = match(movies,
-                    subtitles,
-                    limit=args.limit)
+    if args.zip:
+        # movies and subtitles are already sorted
+        mapping = OrderedDict(zip(movies, subtitles))
+    else:
+        mapping = match(movies,
+                        subtitles,
+                        limit=args.limit)
 
     # Now we print the bash script
     if not mapping:
