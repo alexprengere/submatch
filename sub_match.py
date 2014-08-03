@@ -189,13 +189,17 @@ def main():
     if args.no_ext:
         movies.extend(sorted(files_with_ext('')))
 
+    if not movies or not subtitles:
+        print 'echo No movies/subtitles detected!'
+        exit(1)
+
     mapping = match(movies,
                     subtitles,
                     limit=args.limit)
 
     # Now we print the bash script
     if not mapping:
-        print 'echo No mapping! Check if movies/subs'
+        print 'echo No mapping! Check matching ratio with -l'
         exit(1)
 
     with comments():
