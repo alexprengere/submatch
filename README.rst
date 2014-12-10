@@ -65,7 +65,7 @@ After installation, just run the tool in the folder:
  
  # Actual moves proposed
  # Already good: "./toto.srt"
- mv "./tutu.fr.srt"  
+ mv "./tutu.fr.srt" "./TUTU.srt" 
 
 You can then actually perform the move like this:
 
