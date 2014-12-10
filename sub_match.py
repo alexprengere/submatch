@@ -120,56 +120,60 @@ def fmt_ratio(ratio):
     return colored('{0:5.1f}%'.format(ratio), *colors)
 
 
-def print_report(mapping, remaining_movies, remaining_subs):
+def print_report(method, mapping, remaining_movies, remaining_subs):
     """Report is displayed commented.
     """
-    for movie, sub in mapping.iteritems():
-        ratio = 100 * distance_names(sub, movie)
-        print '{0} {1}{2}'.format(fmt_ratio(ratio), fmt(movie), fmt(sub))
-
     if remaining_subs:
-        print '\nRemaining subs:'
+        print '\nUnmatched subtitles:'
         print '\n'.join(fmt(r) for r in remaining_subs)
 
     if remaining_movies:
-        print '\nRemaining movies:'
+        print '\nUnmatched movies:'
         print '\n'.join(fmt(r) for r in remaining_movies)
 
+    print '\nMatching results with method "{0}":'.format(method.upper())
+    for movie, sub in mapping.iteritems():
+        ratio = 100 * distance_of_names(sub, movie)
+        mark = '✓' if extract_numbers(movie) == extract_numbers(sub) else ' '
 
-def print_mv(mapping, reverse):
+        print '{0} {1} {2}{3}'.format(fmt_ratio(ratio), mark, fmt(movie), fmt(sub))
+
+
+def move_to_match(name, ref):
+    """Move name to match ref, but keep extension.
+    """
+    new_name = op.splitext(ref)[0] + op.splitext(name)[1]
+
+    q = '"{0}"'.format
+    if name != new_name:
+        print 'mv {0:50s} {1:50s}'.format(q(name), q(new_name))
+    else:
+        print '# Already good: {0}'.format(q(new_name))
+
+
+def print_moves(mapping, reverse):
     """Print the final bash script.
     """
-    print
+    print '\n# Actual moves proposed'
     for movie, sub in mapping.iteritems():
         if reverse:
-            # Build new name for movie: sub name + original movie extension
-            new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
-            if movie != new_movie:
-                print 'mv "{0}" "{1}"'.format(movie, new_movie)
-            else:
-                print '# {0} has the right name ;)'.format(movie)
+            move_to_match(movie, ref=sub)
         else:
-            # Build new name for sub
-            new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
-            if sub != new_sub:
-                print 'mv "{0}" "{1}"'.format(sub, new_sub)
-            else:
-                print '# {0} has the right name ;)'.format(sub)
+            move_to_match(sub, ref=movie)
 
-
-clean = lambda name: op.splitext(op.basename(name))[0]
 
 @cached
-def distance_names(a, b):
+def distance_of_names(a, b):
     """Compare names without extensions.
     """
-    a, b = clean(a), clean(b)
+    a = op.splitext(op.basename(a))[0]
+    b = op.splitext(op.basename(b))[0]
 
     return Levenshtein.ratio(a.lower(), b.lower())
 
 
 @cached
-def equal_number_seq(a, b):
+def distance_of_numbers(a, b):
     """Compare number sequence.
     """
     a_numbers = extract_numbers(a)
@@ -180,17 +184,17 @@ def equal_number_seq(a, b):
     return 0
 
 
-def match(movies, subtitles, limit, method='Levenshtein'):
+def match(movies, subtitles, limit, method):
     """Match movies and subtitles.
     """
-    # Store the mapping movie -> sub
-    mapping = OrderedDict()
-    attributed_subs = set()
+    if method == 'zip':
+        # movies and subtitles are already sorted
+        return OrderedDict(zip(movies, subtitles))
 
-    if method == 'Levenshtein':
-        distance = distance_names
+    if method == 'names':
+        distance = distance_of_names
     elif method == 'numbers':
-        distance = equal_number_seq
+        distance = distance_of_numbers
     else:
         raise ValueError('Unkwown method {0}'.format(method))
 
@@ -198,6 +202,10 @@ def match(movies, subtitles, limit, method='Levenshtein'):
     pairs = sorted(product(movies, subtitles),
                    key=lambda p: distance(*p),
                    reverse=True)
+
+    # Store the mapping movie -> sub
+    mapping = OrderedDict()
+    attributed_subs = set()
 
     for movie, sub in pairs:
         # Check if movie/sub has already been used
@@ -282,13 +290,13 @@ def main():
         exit(1)
 
     if args.zip:
-        # movies and subtitles are already sorted
-        mapping = OrderedDict(zip(movies, subtitles))
+        method = 'zip'
+    elif args.numbers:
+        method = 'numbers'
     else:
-        mapping = match(movies,
-                        subtitles,
-                        limit=args.limit,
-                        method='numbers' if args.numbers else 'Levenshtein')
+        method = 'names'
+
+    mapping = match(movies, subtitles, limit=args.limit, method=method)
 
     # Now we print the bash script
     if not mapping:
@@ -299,11 +307,12 @@ def main():
         remaining_movies = set(movies) - set(mapping)
         remaining_subs = set(subtitles) - set(mapping.itervalues())
 
-        print_report(mapping,
+        print_report(method,
+                     mapping,
                      remaining_movies=remaining_movies,
                      remaining_subs=remaining_subs)
 
-    print_mv(mapping, reverse=args.reverse)
+    print_moves(mapping, reverse=args.reverse)
 
 
 if __name__ == '__main__':
