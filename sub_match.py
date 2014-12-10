@@ -132,6 +132,9 @@ def print_report(method, mapping, remaining_movies, remaining_subs):
         print '\nUnmatched movies:'
         print '\n'.join(fmt(r) for r in remaining_movies)
 
+    if not mapping:
+        return
+
     print dedent("""
     Matching results with method "{0}":
      * column 1  : Levenshtein distance between movie name and sub name
@@ -161,6 +164,10 @@ def move_to_match(name, ref):
 def print_moves(mapping, reverse):
     """Print the final bash script.
     """
+    if not mapping:
+        print '\necho No mapping! Check movies, subs, matching ratio (-l)...'
+        return
+
     print '\n# Actual moves proposed'
     for movie, sub in mapping.iteritems():
         if reverse:
@@ -292,10 +299,6 @@ def main():
     if args.no_ext:
         movies.extend(sorted(files_with_ext('')))
 
-    if not movies or not subtitles:
-        print 'echo No movies/subtitles detected!'
-        exit(1)
-
     if args.zip:
         method = 'zip'
     elif args.numbers:
@@ -306,10 +309,6 @@ def main():
     mapping = match(movies, subtitles, limit=args.limit, method=method)
 
     # Now we print the bash script
-    if not mapping:
-        print 'echo No mapping! Check matching ratio with -l'
-        exit(1)
-
     with comments():
         remaining_movies = set(movies) - set(mapping)
         remaining_subs = set(subtitles) - set(mapping.itervalues())
