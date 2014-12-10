@@ -137,11 +137,11 @@ def print_report(method, mapping, remaining_movies, remaining_subs):
         return
 
     print dedent("""
-    Matching results with method "{0}":
+    Matched {0:d} results with method "{1}":
      * column 1  : Levenshtein distance between movie name and sub name
      * column 2  : '✓' if movie name and sub name contain then same numbers
      * column 3+ : [numbers] movie ... [numbers] sub (color based on numbers)
-    """.format(method.upper()))
+    """.format(len(mapping), method.upper()))
 
     for movie, sub in mapping.iteritems():
         ratio = 100 * distance_of_names(sub, movie)
