@@ -9,6 +9,7 @@ from itertools import product
 from contextlib import contextmanager
 from StringIO import StringIO
 from functools import wraps
+from textwrap import dedent
 import re
 
 # Installed through setup.py
@@ -131,7 +132,13 @@ def print_report(method, mapping, remaining_movies, remaining_subs):
         print '\nUnmatched movies:'
         print '\n'.join(fmt(r) for r in remaining_movies)
 
-    print '\nMatching results with method "{0}":'.format(method.upper())
+    print dedent("""
+    Matching results with method "{0}":
+     * column 1  : Levenshtein distance between movie name and sub name
+     * column 2  : '✓' if movie name and sub name contain then same numbers
+     * column 3+ : [numbers] movie ... [numbers] sub (color based on numbers)
+    """.format(method.upper()))
+
     for movie, sub in mapping.iteritems():
         ratio = 100 * distance_of_names(sub, movie)
         mark = '✓' if extract_numbers(movie) == extract_numbers(sub) else ' '
