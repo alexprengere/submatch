@@ -90,7 +90,8 @@ COLORS = [
 
 def extract_numbers(name):
     """Extract numbers from string."""
-    return [int(d) for d in re.findall(r'\d+', name)][:2]
+    name = op.splitext(op.basename(name))[0]
+    return [int(d) for d in re.findall(r'\d+', name)]
 
 
 def compute_colors(number):
