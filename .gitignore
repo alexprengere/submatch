@@ -1,6 +1,7 @@
 *.txt
 # Movies
 *.avi
+*.AVI
 *.mkv
 # Subs
 *.srt

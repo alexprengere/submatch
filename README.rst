@@ -19,7 +19,7 @@ Usage
 .. code-block:: bash
 
  $ submatch -h
- usage: sub_match.py [-h] [-l L] [-r] [-z] [-n]
+ usage: submatch [-h] [-l L] [-r] [-z] [-n] [-N]
  
  optional arguments:
    -h, --help       show this help message and exit
@@ -30,7 +30,9 @@ Usage
    -z, --zip        Change the logic of matching. Zip the sorted list of movies
                     and subtitles instead of match on names. This will not use
                     -l/--limit option.
-   -n, --no-ext     Consider files with no extension as movies.
+   -n, --numbers    Change the logic of matching. Use numbers in names to
+                    perform the matching. This will not use -l/--limit option.
+   -N, --no-ext     Consider files with no extension as movies.
 
 Example
 -------
@@ -46,14 +48,24 @@ After installation, just run the tool in the folder:
 .. code-block:: bash
 
  $ submatch
- # 100%	./toto.avi	->	./toto.srt
- # 73%	./TUTU.AVI	->	./tutu.fr.srt
  # 
- # Remaining subs  : ./titi.sub
- # Remaining movies: ./tata.avi
-
- # ./toto.srt has the right name ;)
- mv ./tutu.fr.srt ./TUTU.srt
+ # Unmatched subtitles:
+ # [      ] ./titi.sub                                                  
+ # 
+ # Unmatched movies:
+ # [      ] ./tata.avi                                                  
+ # 
+ # Matching results with method "NAMES":
+ #  * column 1  : Levenshtein distance between movie name and sub name
+ #  * column 2  : '✓' if movie name and sub name contain then same numbers
+ #  * column 3+ : [numbers] movie ... [numbers] sub (color based on numbers)
+ # 
+ # 100.0% ✓ [      ] ./toto.avi              [      ] ./toto.srt
+ #  72.7% ✓ [      ] ./TUTU.AVI              [      ] ./tutu.fr.srt
+ 
+ # Actual moves proposed
+ # Already good: "./toto.srt"
+ mv "./tutu.fr.srt"  
 
 You can then actually perform the move like this:
 
