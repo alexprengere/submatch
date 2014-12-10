@@ -109,13 +109,13 @@ def fmt_ratio(ratio):
     if ratio == 100:
         colors = ('white', 'on_green')
     elif ratio >= 90:
-        colors = ('white', 'on_yellow')
-    elif ratio >= 80:
         colors = ('grey', 'on_white')
-    elif ratio >= 60:
-        colors = ('white', 'on_magenta')
-    else:
+    elif ratio >= 80:
+        colors = ('white', 'on_yellow')
+    elif ratio >= 70:
         colors = ('white', 'on_red')
+    else:
+        colors = ('white', 'on_magenta')
 
     return colored('{0:5.1f}%'.format(ratio), *colors)
 
