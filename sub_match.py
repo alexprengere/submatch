@@ -165,7 +165,7 @@ def print_moves(mapping, reverse):
     """Print the final bash script.
     """
     if not mapping:
-        print '\necho No mapping! Check movies, subs, matching ratio (-l)...'
+        print '\necho >&2 "No mapping! Check match limit (-l) or try -z/-n"'
         return
 
     print '\n# Actual moves proposed'
@@ -293,11 +293,14 @@ def main():
 
     args = parser.parse_args()
 
-    movies = sorted(files_with_ext(*EXT_MOVIE))
     subtitles = sorted(files_with_ext(*EXT_SUBTITLE))
-
+    movies = sorted(files_with_ext(*EXT_MOVIE))
     if args.no_ext:
         movies.extend(sorted(files_with_ext('')))
+
+    if not movies and not subtitles:
+        print 'echo >&2 "No movies/subs found! Move in the right folder!"'
+        return
 
     if args.zip:
         method = 'zip'
@@ -322,5 +325,5 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
+
