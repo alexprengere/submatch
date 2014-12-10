@@ -12,7 +12,7 @@ from functools import wraps
 import re
 
 # Installed through setup.py
-from Levenshtein import ratio
+import Levenshtein
 from ordereddict import OrderedDict
 import colorama
 from termcolor import colored
@@ -92,14 +92,14 @@ def extract_numbers(name):
     return [int(d) for d in re.findall(r'\d+', name)][:2]
 
 
-def colors_from_num(n):
+def compute_colors(number):
     """Compute color based on number."""
-    return COLORS[n % len(COLORS)]
+    return COLORS[number % len(COLORS)]
 
 
-def color(name):
+def fmt(name):
     numbers = extract_numbers(name)
-    colors = colors_from_num(sum(numbers) if numbers else 0)
+    colors = compute_colors(sum(numbers) if numbers else 0)
 
     flat_numbers = '/'.join(str(d) for d in numbers)
     return colored('[{0:<6s}] {1:60s}'.format(flat_numbers, name), *colors)
@@ -110,15 +110,15 @@ def print_report(mapping, remaining_movies, remaining_subs):
     """
     for movie, sub in mapping.iteritems():
         ratio = 100 * distance_names(sub, movie)
-        print '{0:.0f}%\t{1}{2}'.format(ratio, color(movie), color(sub))
+        print '{0:.0f}%\t{1}{2}'.format(ratio, fmt(movie), fmt(sub))
 
     if remaining_subs:
         print '\nRemaining subs:'
-        print '\n'.join(color(r) for r in remaining_subs)
+        print '\n'.join(fmt(r) for r in remaining_subs)
 
     if remaining_movies:
         print '\nRemaining movies:'
-        print '\n'.join(color(r) for r in remaining_movies)
+        print '\n'.join(fmt(r) for r in remaining_movies)
 
 
 def print_mv(mapping, reverse):
@@ -142,26 +142,46 @@ def print_mv(mapping, reverse):
                 print '# {0} has the right name ;)'.format(sub)
 
 
+clean = lambda name: op.splitext(op.basename(name))[0]
+
 @cached
 def distance_names(a, b):
     """Compare names without extensions.
     """
-    a = op.splitext(op.basename(a))[0]
-    b = op.splitext(op.basename(b))[0]
+    a, b = clean(a), clean(b)
 
-    return ratio(a.lower(), b.lower())
+    return Levenshtein.ratio(a.lower(), b.lower())
 
 
-def match(movies, subtitles, limit):
+@cached
+def equal_number_seq(a, b):
+    """Compare number sequence.
+    """
+    a_numbers = extract_numbers(a)
+    b_numbers = extract_numbers(b)
+
+    if a_numbers and b_numbers and a_numbers == b_numbers:
+        return 1
+    return 0
+
+
+def match(movies, subtitles, limit, method='Levenshtein'):
     """Match movies and subtitles.
     """
     # Store the mapping movie -> sub
     mapping = OrderedDict()
     attributed_subs = set()
 
+    if method == 'Levenshtein':
+        distance = distance_names
+    elif method == 'numbers':
+        distance = equal_number_seq
+    else:
+        raise ValueError('Unkwown method {0}'.format(method))
+
     # Finding best sub for this movie
     pairs = sorted(product(movies, subtitles),
-                   key=lambda p: distance_names(*p),
+                   key=lambda p: distance(*p),
                    reverse=True)
 
     for movie, sub in pairs:
@@ -170,7 +190,7 @@ def match(movies, subtitles, limit):
             continue
 
         # Then, if ratio is too bad we end the attribution process
-        if distance_names(movie, sub) < limit:
+        if distance(movie, sub) < limit:
             break
 
         # We do not want this sub/movie to be used again
@@ -219,7 +239,16 @@ def main():
         """)
 
     parser.add_argument(
-        '-n', '--no-ext',
+        '-n', '--numbers',
+        action='store_true',
+        help="""
+        Change the logic of matching. Use numbers in
+        names to perform the matching.
+        This will not use -l/--limit option.
+        """)
+
+    parser.add_argument(
+        '-N', '--no-ext',
         action='store_true',
         help="""
         Consider files with no extension as movies.
@@ -243,7 +272,8 @@ def main():
     else:
         mapping = match(movies,
                         subtitles,
-                        limit=args.limit)
+                        limit=args.limit,
+                        method='numbers' if args.numbers else 'Levenshtein')
 
     # Now we print the bash script
     if not mapping:
