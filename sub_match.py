@@ -80,7 +80,7 @@ COLORS = [
     ('white', 'on_grey'),
     ('white', 'on_red'),
     ('white', 'on_green'),
-    ('grey', 'on_yellow'),
+    ('white', 'on_yellow'),
     ('white', 'on_blue'),
     ('white', 'on_magenta'),
     ('white', 'on_cyan'),
@@ -105,12 +105,27 @@ def fmt(name):
     return colored('[{0:<6s}] {1:60s}'.format(flat_numbers, name), *colors)
 
 
+def fmt_ratio(ratio):
+    if ratio == 100:
+        colors = ('white', 'on_green')
+    elif ratio >= 90:
+        colors = ('white', 'on_yellow')
+    elif ratio >= 80:
+        colors = ('grey', 'on_white')
+    elif ratio >= 60:
+        colors = ('white', 'on_magenta')
+    else:
+        colors = ('white', 'on_red')
+
+    return colored('{0:5.1f}%'.format(ratio), *colors)
+
+
 def print_report(mapping, remaining_movies, remaining_subs):
     """Report is displayed commented.
     """
     for movie, sub in mapping.iteritems():
         ratio = 100 * distance_names(sub, movie)
-        print '{0:.0f}%\t{1}{2}'.format(ratio, fmt(movie), fmt(sub))
+        print '{0} {1}{2}'.format(fmt_ratio(ratio), fmt(movie), fmt(sub))
 
     if remaining_subs:
         print '\nRemaining subs:'
