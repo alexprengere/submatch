@@ -130,14 +130,14 @@ def print_mv(mapping, reverse):
             # Build new name for movie: sub name + original movie extension
             new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
             if movie != new_movie:
-                print 'mv "{0}"\t"{1}"'.format(movie, new_movie)
+                print 'mv "{0}"  "{1}"'.format(movie, new_movie)
             else:
                 print '# {0} has the right name ;)'.format(movie)
         else:
             # Build new name for sub
             new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
             if sub != new_sub:
-                print 'mv "{0}"\t"{1}"'.format(sub, new_sub)
+                print 'mv "{0}"  "{1}"'.format(sub, new_sub)
             else:
                 print '# {0} has the right name ;)'.format(sub)
 
