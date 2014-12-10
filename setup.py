@@ -43,5 +43,7 @@ setup(
         'python_Levenshtein',
         'ordereddict',
         'argparse',
+        'termcolor',
+        'colorama',
     ],
 )

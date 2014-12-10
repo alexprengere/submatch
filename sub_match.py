@@ -9,10 +9,13 @@ from itertools import product
 from contextlib import contextmanager
 from StringIO import StringIO
 from functools import wraps
+import re
 
 # Installed through setup.py
 from Levenshtein import ratio
 from ordereddict import OrderedDict
+import colorama
+from termcolor import colored
 
 # Extension used
 EXT_MOVIE = 'avi', 'mkv', 'mp4', \
@@ -73,6 +76,51 @@ def files_with_ext(*extensions):
                 yield op.join(root, name)
 
 
+COLORS = [
+    ('white', 'on_grey'),
+    ('white', 'on_red'),
+    ('white', 'on_green'),
+    ('grey', 'on_yellow'),
+    ('white', 'on_blue'),
+    ('white', 'on_magenta'),
+    ('white', 'on_cyan'),
+    ('grey', 'on_white'),
+]
+
+def extract_numbers(name):
+    """Extract numbers from string."""
+    return [int(d) for d in re.findall(r'\d+', name)][:2]
+
+
+def colors_from_num(n):
+    """Compute color based on number."""
+    return COLORS[n % len(COLORS)]
+
+
+def color(name):
+    numbers = extract_numbers(name)
+    colors = colors_from_num(sum(numbers) if numbers else 0)
+
+    flat_numbers = '/'.join(str(d) for d in numbers)
+    return colored('[{0:<6s}] {1:60s}'.format(flat_numbers, name), *colors)
+
+
+def print_report(mapping, remaining_movies, remaining_subs):
+    """Report is displayed commented.
+    """
+    for movie, sub in mapping.iteritems():
+        ratio = 100 * distance_names(sub, movie)
+        print '{0:.0f}%\t{1}{2}'.format(ratio, color(movie), color(sub))
+
+    if remaining_subs:
+        print '\nRemaining subs:'
+        print '\n'.join(color(r) for r in remaining_subs)
+
+    if remaining_movies:
+        print '\nRemaining movies:'
+        print '\n'.join(color(r) for r in remaining_movies)
+
+
 def print_mv(mapping, reverse):
     """Print the final bash script.
     """
@@ -82,31 +130,16 @@ def print_mv(mapping, reverse):
             # Build new name for movie: sub name + original movie extension
             new_movie = op.splitext(sub)[0] + op.splitext(movie)[1]
             if movie != new_movie:
-                print 'mv "{0}" "{1}"'.format(movie, new_movie)
+                print 'mv "{0}"\t"{1}"'.format(movie, new_movie)
             else:
                 print '# {0} has the right name ;)'.format(movie)
         else:
             # Build new name for sub
             new_sub = op.splitext(movie)[0] + op.splitext(sub)[1]
             if sub != new_sub:
-                print 'mv "{0}" "{1}"'.format(sub, new_sub)
+                print 'mv "{0}"\t"{1}"'.format(sub, new_sub)
             else:
                 print '# {0} has the right name ;)'.format(sub)
-
-
-def print_report(mapping, remaining_movies, remaining_subs):
-    """Report is displayed commented.
-    """
-    for movie, sub in mapping.iteritems():
-        ratio = distance_names(sub, movie)
-        print '{0:.0f}%\t{1}\t->\t{2}'.format(100 * ratio, movie, sub)
-
-    print
-    if remaining_subs:
-        print 'Remaining subs  :', ' '.join(remaining_subs)
-
-    if remaining_movies:
-        print 'Remaining movies:', ' '.join(remaining_movies)
 
 
 @cached
@@ -151,6 +184,8 @@ def match(movies, subtitles, limit):
 def main():
     """Main runner.
     """
+    colorama.init()
+
     import argparse
     parser = argparse.ArgumentParser()
 
