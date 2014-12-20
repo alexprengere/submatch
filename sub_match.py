@@ -88,9 +88,15 @@ COLORS = [
     ('grey', 'on_white'),
 ]
 
+NOT_EXTRACTED = 'x264', '720', '1080'
+
 def extract_numbers(name):
     """Extract numbers from string."""
     name = op.splitext(op.basename(name))[0]
+
+    for s in NOT_EXTRACTED:
+        name = name.replace(s, '')
+
     return [int(d) for d in re.findall(r'\d+', name)]
 
 
