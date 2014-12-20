@@ -88,13 +88,12 @@ COLORS = [
     ('grey', 'on_white'),
 ]
 
-NOT_EXTRACTED = 'x264', '720', '1080'
 
 def extract_numbers(name):
-    """Extract numbers from string."""
+    """Extract numbers from string.
+    """
     name = op.splitext(op.basename(name))[0]
-
-    for s in NOT_EXTRACTED:
+    for s in 'x264', '720', '1080':
         name = name.replace(s, '')
 
     return [int(d) for d in re.findall(r'\d+', name)]
@@ -175,7 +174,7 @@ def print_moves(mapping, reverse):
         print '\necho >&2 "No mapping! Check match limit (-l) or try -z/-n"'
         return
 
-    print '\n# Actual moves proposed'
+    print '\n# Actual moves proposed:'
     for movie, sub in mapping.iteritems():
         if reverse:
             move_to_match(movie, ref=sub)
