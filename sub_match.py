@@ -81,7 +81,7 @@ COLORS = [
     ('white', 'on_grey'),
     ('white', 'on_red'),
     ('white', 'on_green'),
-    ('white', 'on_yellow'),
+    ('grey', 'on_yellow'),
     ('white', 'on_blue'),
     ('white', 'on_magenta'),
     ('white', 'on_cyan'),
@@ -118,7 +118,7 @@ def fmt_ratio(ratio):
     elif ratio >= 90:
         colors = ('grey', 'on_white')
     elif ratio >= 80:
-        colors = ('white', 'on_yellow')
+        colors = ('grey', 'on_yellow')
     elif ratio >= 70:
         colors = ('white', 'on_red')
     else:
