@@ -28,6 +28,9 @@ EXT_SUBTITLE = 'srt', 'sub', 'smi'
 # Minimal matching ratio
 DEFAULT_RATIO = 0.60
 
+# Part of name ignored when searching for numbers
+IGNORED = 'x264', '720', '1080'
+
 
 @contextmanager
 def comments(comment_char='#'):
@@ -93,7 +96,7 @@ def extract_numbers(name):
     """Extract numbers from string.
     """
     name = op.splitext(op.basename(name))[0]
-    for s in 'x264', '720', '1080':
+    for s in IGNORED:
         name = name.replace(s, '')
 
     return [int(d) for d in re.findall(r'\d+', name)]
@@ -109,7 +112,7 @@ def fmt(name):
     colors = compute_colors(sum(numbers) if numbers else 0)
 
     flat_numbers = '/'.join(str(d) for d in numbers)
-    return colored('[{0:<6s}] {1:60s}'.format(flat_numbers, name), *colors)
+    return colored('[{0:<7s}] {1:80s}'.format(flat_numbers, name), *colors)
 
 
 def fmt_ratio(ratio):
@@ -132,11 +135,11 @@ def print_report(method, mapping, remaining_movies, remaining_subs):
     """
     if remaining_subs:
         print '\nUnmatched subtitles:'
-        print '\n'.join(fmt(r) for r in remaining_subs)
+        print '\n'.join(fmt(r) for r in sorted(remaining_subs))
 
     if remaining_movies:
         print '\nUnmatched movies:'
-        print '\n'.join(fmt(r) for r in remaining_movies)
+        print '\n'.join(fmt(r) for r in sorted(remaining_movies))
 
     if not mapping:
         return
@@ -155,7 +158,7 @@ def print_report(method, mapping, remaining_movies, remaining_subs):
         print '{0} {1} {2}{3}'.format(fmt_ratio(ratio), mark, fmt(movie), fmt(sub))
 
 
-def move_to_match(name, ref):
+def print_move_to_match(name, ref):
     """Move name to match ref, but keep extension.
     """
     new_name = op.splitext(ref)[0] + op.splitext(name)[1]
@@ -177,9 +180,18 @@ def print_moves(mapping, reverse):
     print '\n# Actual moves proposed:'
     for movie, sub in mapping.iteritems():
         if reverse:
-            move_to_match(movie, ref=sub)
+            print_move_to_match(movie, ref=sub)
         else:
-            move_to_match(sub, ref=movie)
+            print_move_to_match(sub, ref=movie)
+
+
+def have_same_name(a, b):
+    """Compare base names without extensions.
+    """
+    a = op.splitext(op.basename(a))[0]
+    b = op.splitext(op.basename(b))[0]
+
+    return a == b
 
 
 @cached
@@ -208,8 +220,19 @@ def match(movies, subtitles, limit, method):
     """Match movies and subtitles.
     """
     if method == 'zip':
-        # movies and subtitles are already sorted
-        return OrderedDict(zip(movies, subtitles))
+        matched = {}
+        for movie in movies:
+            for sub in subtitles:
+                if have_same_name(movie, sub):
+                    matched[movie] = sub
+                    break
+
+        remaining_movies = set(movies) - set(matched)
+        remaining_subs = set(subtitles) - set(matched.itervalues())
+
+        return OrderedDict(
+            matched.items() + \
+            zip(sorted(remaining_movies), sorted(remaining_subs)))
 
     if method == 'names':
         distance = distance_of_names
