@@ -6,7 +6,7 @@
     <title>SubMatch by alexprengere</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
     <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
       </header>
       <section>
         <h1>
-<a name="submatch" class="anchor" href="#submatch"><span class="octicon octicon-link"></span></a>SubMatch</h1>
+<a id="submatch" class="anchor" href="#submatch" aria-hidden="true"><span class="octicon octicon-link"></span></a>SubMatch</h1>
 
 <p>This is a Python utility to match movies and subtitles inside a
 directory, based on their names. It is specially useful for series with
@@ -40,54 +40,64 @@ lots of subtitles.</p>
 <p>The output is a shell script containing the right <code>mv</code> commands.</p>
 
 <h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>python setup.py install --user
-</pre></div>
+<div class="highlight highlight-source-shell"><pre>$ python setup.py install --user</pre></div>
 
 <h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>submatch -h
-usage: sub_match.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-l L<span class="o">]</span> <span class="o">[</span>-r<span class="o">]</span> <span class="o">[</span>-n<span class="o">]</span>
+<div class="highlight highlight-source-shell"><pre>$ submatch -h
+usage: submatch [-h] [-l L] [-r] [-z] [-n] [-N]
 
 optional arguments:
-  -h, --help       show this <span class="nb">help </span>message and <span class="nb">exit</span>
-  -l L, --limit L  Change lower bound <span class="k">for</span> matching ratio. Default is 0.6.
+  -h, --help       show this <span class="pl-c1">help</span> message and <span class="pl-c1">exit</span>
+  -l L, --limit L  Change lower bound <span class="pl-k">for</span> matching ratio. Default is 0.6.
                    Matches below that percentage are automatically excluded.
   -r, --reverse    Reverse the logic of renaming. With this option, movies are
                    renamed, not subtitles.
-  -n, --no-ext     Consider files with no extension as movies.
-</pre></div>
+  -z, --zip        Change the logic of matching. Zip the sorted list of movies
+                   and subtitles instead of match on names. This will not use
+                   -l/--limit option.
+  -n, --numbers    Change the logic of matching. Use numbers <span class="pl-k">in</span> names to
+                   perform the matching. This will not use -l/--limit option.
+  -N, --no-ext     Consider files with no extension as movies.</pre></div>
 
 <h2>
-<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
 
 <p>Suppose you have some movies and subtitles:</p>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>touch tata.avi titi.sub toto.avi toto.srt TUTU.AVI tutu.fr.srt
-</pre></div>
+<div class="highlight highlight-source-shell"><pre>$ touch tata.avi titi.sub toto.avi toto.srt TUTU.AVI tutu.fr.srt</pre></div>
 
 <p>After installation, just run the tool in the folder:</p>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>submatch
-<span class="c"># 100% ./toto.avi      -&gt;      ./toto.srt</span>
-<span class="c"># 73%  ./TUTU.AVI      -&gt;      ./tutu.fr.srt</span>
-<span class="c">#</span>
-<span class="c"># Remaining subs  : ./titi.sub</span>
-<span class="c"># Remaining movies: ./tata.avi</span>
+<div class="highlight highlight-source-shell"><pre>$ submatch
+<span class="pl-c"># </span>
+<span class="pl-c"># Unmatched subtitles:</span>
+<span class="pl-c"># [      ] ./titi.sub                                                  </span>
+<span class="pl-c"># </span>
+<span class="pl-c"># Unmatched movies:</span>
+<span class="pl-c"># [      ] ./tata.avi                                                  </span>
+<span class="pl-c"># </span>
+<span class="pl-c"># Matching results with method "NAMES":</span>
+<span class="pl-c">#  * column 1  : Levenshtein distance between movie name and sub name</span>
+<span class="pl-c">#  * column 2  : '✓' if movie name and sub name contain then same numbers</span>
+<span class="pl-c">#  * column 3+ : [numbers] movie ... [numbers] sub (color based on numbers)</span>
+<span class="pl-c"># </span>
+<span class="pl-c"># 100.0% ✓ [      ] ./toto.avi              [      ] ./toto.srt</span>
+<span class="pl-c">#  72.7% ✓ [      ] ./TUTU.AVI              [      ] ./tutu.fr.srt</span>
 
-<span class="c"># ./toto.srt has the right name ;)</span>
-mv ./tutu.fr.srt ./TUTU.srt
-</pre></div>
+<span class="pl-c"># Actual moves proposed</span>
+<span class="pl-c"># Already good: "./toto.srt"</span>
+mv <span class="pl-s"><span class="pl-pds">"</span>./tutu.fr.srt<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>./TUTU.srt<span class="pl-pds">"</span></span> </pre></div>
 
 <p>You can then actually perform the move like this:</p>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>submatch <span class="p">|</span> sh
-</pre></div>
+<div class="highlight highlight-source-shell"><pre>$ submatch <span class="pl-k">|</span> sh</pre></div>
       </section>
       <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
