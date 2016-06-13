@@ -3,7 +3,8 @@
 
 from __future__ import division
 
-import os, sys
+import os
+import sys
 import os.path as op
 from itertools import product
 from contextlib import contextmanager
@@ -68,7 +69,7 @@ def files_with_ext(*extensions):
     >>> list(files_with_ext('avi'))
     ['movie.avi', 'movie_2.avi']
     """
-    authorized_extensions = set(extensions) # faster lookup
+    authorized_extensions = set(extensions)  # faster lookup
 
     for root, _, files in os.walk('.', topdown=False):
         for name in files:
@@ -231,7 +232,7 @@ def match(movies, subtitles, limit, method):
         remaining_subs = set(subtitles) - set(matched.itervalues())
 
         return OrderedDict(
-            matched.items() + \
+            matched.items() +
             zip(sorted(remaining_movies), sorted(remaining_subs)))
 
     if method == 'names':
@@ -266,10 +267,8 @@ def match(movies, subtitles, limit, method):
     return mapping
 
 
-
 def main():
-    """Main runner.
-    """
+    """Main runner."""
     colorama.init()
 
     import argparse
@@ -355,4 +354,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
